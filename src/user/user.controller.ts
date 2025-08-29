@@ -1,12 +1,16 @@
-import { Body, Controller, Get, ParseIntPipe, Post, Param, Put, Patch, Delete } from '@nestjs/common'
+import { Body, Controller, Get, ParseIntPipe, Post, Param, Put, Patch, Delete, UseInterceptors } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UserService } from './user.service'
 import { UpdatePutUserDto } from './dto/update-put-user.dto'
 import { UpdatePatchUserDto } from './dto/update-patch-user.dto'
+import { LogInterceptor } from '../interceptors/log.interceptor'
+import { ParamId } from '../decorators/param-id.decorator'
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @UseInterceptors(LogInterceptor)
   @Post()
   async create(@Body() data: CreateUserDto) {
     return this.userService.create(data)
@@ -18,7 +22,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@ParamId() id: number) {
     return this.userService.findById(id)
   }
 
